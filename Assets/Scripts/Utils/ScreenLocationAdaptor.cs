@@ -8,11 +8,14 @@ public class ScreenLocationAdaptor : MonoBehaviour
     [SerializeField]
     private Camera camera;
 
+    [SerializeField]
+    private float screenOffset;
+
     private void Awake()
     {
-        var leftDiff  = (-camera.orthographicSize * camera.aspect) - Constants.SCREEN_OFFSET;
-        var rightDiff = (camera.orthographicSize * camera.aspect) + Constants.SCREEN_OFFSET;
+        var leftDiff  = (-camera.orthographicSize * camera.aspect) + screenOffset;
+        var rightDiff = (camera.orthographicSize * camera.aspect) + screenOffset;
 
-        transform.position = new Vector3(transform.position.x <= 0 ? leftDiff : rightDiff, 0, 0);
+        transform.position = new Vector3(screenOffset <= 0 ? leftDiff : rightDiff, transform.position.y, transform.position.z);
     }
 }

@@ -6,19 +6,9 @@ using UnityEngine.Events;
 /// </summary>
 public class InputManager : MonoBehaviour
 {
-    public static UnityEvent OnTap;
+    public static UnityEvent OnTap = new UnityEvent();
 
-    public static void Initialize()
-    {
-        OnTap = new UnityEvent();
-    }
-
-    public static void Destroy()
-    {
-        OnTap.RemoveAllListeners();
-    }
-
-    public static void Update()
+    private void Update()
     {
         CheckTouch();
     }

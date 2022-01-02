@@ -13,17 +13,26 @@ public class CharacterController : MonoBehaviour
 
     private void Start()
     {
-        Initialize();
         AddListeners();
     }
 
-    private void Initialize()
+    private void OnDestroy()
     {
+        RemoveListeners();
     }
 
     private void AddListeners()
     {
         InputManager.OnTap.AddListener(OnTap);
+
+        EventsManager.OnReplay.AddListener(OnReplay);
+    }
+
+    private void RemoveListeners()
+    {
+        InputManager.OnTap.RemoveListener(OnTap);
+
+        EventsManager.OnReplay.RemoveListener(OnReplay);
     }
 
     /// <summary>
@@ -32,6 +41,14 @@ public class CharacterController : MonoBehaviour
     private void OnTap()
     {
         Jump();
+    }
+
+    /// <summary>
+    /// On game replay listener
+    /// </summary>
+    private void OnReplay()
+    {
+        transform.position = Vector3.zero;
     }
 
     /// <summary>

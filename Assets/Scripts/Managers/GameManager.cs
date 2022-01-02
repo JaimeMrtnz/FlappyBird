@@ -10,15 +10,8 @@ public class GameManager : MonoBehaviour
 
     private void Awake()
     {
-        InputManager.Initialize();
-
         Initialize();
         AddListeners();
-    }
-
-    private void Update()
-    {
-        InputManager.Update();
     }
 
     private void OnDestroy()
@@ -28,7 +21,6 @@ public class GameManager : MonoBehaviour
 
     private void Initialize()
     {
-        EventsManager.OnNewScore.Invoke(0);
         Time.timeScale = 0;
     }
 
@@ -37,6 +29,8 @@ public class GameManager : MonoBehaviour
         EventsManager.OnGameStart.AddListener(OnGameStart);
 
         EventsManager.OnGameOver.AddListener(OnGameOver);
+
+        EventsManager.OnReplay.AddListener(OnReplay);
 
         EventsManager.OnPipeSucceeded.AddListener(OnPipeSucceeded);
     }
@@ -47,19 +41,42 @@ public class GameManager : MonoBehaviour
 
         EventsManager.OnGameOver.RemoveListener(OnGameOver);
 
+        EventsManager.OnReplay.RemoveListener(OnReplay);
+
         EventsManager.OnPipeSucceeded.RemoveListener(OnPipeSucceeded);
     }
 
+    /// <summary>
+    /// On game start listener
+    /// </summary>
     private void OnGameStart()
     {
         Time.timeScale = 1;
     }
 
+    /// <summary>
+    /// on game over listener
+    /// </summary>
     private void OnGameOver()
     {
         Time.timeScale = 0;
     }
 
+    /// <summary>
+    /// On game replay listener
+    /// </summary>
+    private void OnReplay()
+    {
+        score = 0;
+
+        EventsManager.OnNewScore.Invoke(score);
+
+        EventsManager.OnGameStart.Invoke();
+    }
+
+    /// <summary>
+    /// when the character goes through a pipe event listener
+    /// </summary>
     private void OnPipeSucceeded()
     {
         score++;

@@ -46,4 +46,12 @@ public class Pooler
     {
         return pool.Where(x => !x.activeInHierarchy).FirstOrDefault();
     }
+
+    /// <summary>
+    /// Resets the whole pool
+    /// </summary>
+    public void Reset()
+    {
+        pool.ForEach(x => x.GetComponent<PipeController>().Stop());
+    }
 }

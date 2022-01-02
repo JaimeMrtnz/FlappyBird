@@ -1,3 +1,4 @@
+using System;
 using UnityEngine;
 
 /// <summary>
@@ -26,13 +27,13 @@ public class PipesManager : MonoBehaviour
 
     private Pooler pipesPooler;
     private float currentTime = 0;
-    private float currentSpeed = 1;
 
     private void Awake()
     {
         pipesPooler = new Pooler(pipesPrefab, content, amount);
         pipesPooler.SpawnObjects();
 
+        AddListeners();
         ActivatePipe();
     }
 
@@ -48,12 +49,39 @@ public class PipesManager : MonoBehaviour
         currentTime += Time.deltaTime;
     }
 
+    private void OnDestroy()
+    {
+        RemoveListeners();
+    }
+
+
+    private void AddListeners()
+    {
+        EventsManager.OnReplay.AddListener(OnReplay);
+    }
+
+    private void RemoveListeners()
+    {
+        EventsManager.OnReplay.RemoveListener(OnReplay);
+    }
+
+    /// <summary>
+    /// On replay event listener
+    /// </summary>
+    /// <exception cref="NotImplementedException"></exception>
+    private void OnReplay()
+    {
+        currentTime = 0;
+        pipesPooler.Reset();
+        ActivatePipe();
+    }
+
     /// <summary>
     /// Gets a pipe from pool and activates it
     /// </summary>
     private void ActivatePipe()
     {
         var pipe = pipesPooler.GetObject().GetComponent<PipeController>();
-        pipe.Ready(currentSpeed, rangeHeight);
+        pipe.Ready(initSpeed, rangeHeight);
     }
 }

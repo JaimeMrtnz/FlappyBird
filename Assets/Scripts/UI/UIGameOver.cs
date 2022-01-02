@@ -31,7 +31,8 @@ public class UIGameOver : UIPanel
     /// </summary>
     public void OnReplayClick()
     {
-        SceneManager.LoadScene(0);
+        EventsManager.OnReplay.Invoke();
+        Hide();
     }
 
     /// <summary>
