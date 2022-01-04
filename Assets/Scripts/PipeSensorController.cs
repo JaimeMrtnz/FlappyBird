@@ -7,7 +7,7 @@ public class PipeSensorController : MonoBehaviour
 {
     private void OnTriggerEnter2D(Collider2D collision)
     {
-        if(collision.tag.Equals(Constants.PLAYER_TAG))
+        if(collision.CompareTag(Constants.PLAYER_TAG))
         {
             EventsManager.OnPipeSucceeded.Invoke();
         }
