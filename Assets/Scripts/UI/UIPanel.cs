@@ -25,12 +25,12 @@ public class UIPanel : MonoBehaviour
     protected virtual void RemoveListeners() 
     { }
 
-    protected virtual void Show()
+    public virtual void Show()
     {
         gameObject.SetActive(true); 
     }
 
-    protected virtual void Hide()
+    public virtual void Hide()
     {
         gameObject.SetActive(false); 
     }
