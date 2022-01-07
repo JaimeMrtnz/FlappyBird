@@ -16,16 +16,14 @@ public class UIStore : UIPanel
     private Transform content;
 
     private PlayFabPurchaseManager playFabPurchase;
-    private UserInventory inventory;
+    private List<ItemInstance> inventory;
     private List<UIItemObjController> itemsSpawned;
-    private IParser parser;
 
     protected override void Initialize()
     {
         base.Initialize();
 
         itemsSpawned = new List<UIItemObjController>();
-        parser = new UnityJsonUtilityAdapter();
 
         Hide();
     }
@@ -35,7 +33,7 @@ public class UIStore : UIPanel
         base.AddListeners();
 
         EventsManager.OnCatalogItemsReceived.AddListener(OnStoreItemsReceived);
-        EventsManager.OnItemPurchased.AddListener(OnItemPurchased);
+        //EventsManager.OnItemPurchased.AddListener(OnItemPurchased);
     }
 
     protected override void RemoveListeners()
@@ -43,14 +41,14 @@ public class UIStore : UIPanel
         base.RemoveListeners();
 
         EventsManager.OnCatalogItemsReceived.RemoveListener(OnStoreItemsReceived);
-        EventsManager.OnItemPurchased.RemoveListener(OnItemPurchased);
+        //EventsManager.OnItemPurchased.RemoveListener(OnItemPurchased);
     }
 
     /// <summary>
     /// On store items received event listener
     /// </summary>
     /// <param name="arg0"></param>
-    private void OnStoreItemsReceived(PlayFabPurchaseManager playFabPurchase, UserInventory inventory)
+    private void OnStoreItemsReceived(PlayFabPurchaseManager playFabPurchase, List<ItemInstance> inventory)
     {
         this.playFabPurchase = playFabPurchase;
         this.inventory = inventory;
@@ -62,10 +60,10 @@ public class UIStore : UIPanel
     /// </summary>
     /// <param name="item"></param>
     /// <param name="purchased"></param>
-    private void OnItemPurchased(ItemInstance item)
-    {
-        RefreshItems();
-    }
+    //private void OnItemPurchased(ItemInstance item)
+    //{
+    //    RefreshItems();
+    //}
 
     /// <summary>
     /// Refreshes items in store
@@ -96,7 +94,7 @@ public class UIStore : UIPanel
 
             itemObj.SetPrice(item.VirtualCurrencyPrices);
 
-            itemObj.SetPurchased(item.ItemId, item.Consumable, inventory.Inventory.Any(x => x.ItemId.Equals(item.ItemId))); ;
+            itemObj.SetPurchased(item.ItemId, item.Consumable, inventory.Any(x => x.ItemId.Equals(item.ItemId))); ;
         
             itemsSpawned.Add(itemObj);
         }

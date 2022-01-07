@@ -1,10 +1,23 @@
-using UnityEngine.SceneManagement;
+using PlayFab.ClientModels;
+using System;
+using System.Collections.Generic;
+using TMPro;
+using UnityEngine;
 
 /// <summary>
 /// Manages the game over canvas
 /// </summary>
 public class UIGameOver : UIPanel
 {
+    [Header("Multiplier fields")]
+    [SerializeField]
+    private GameObject multiplierContent;
+
+    [SerializeField]
+    private TextMeshProUGUI multiplierText;
+
+    private bool tripleMultiplierPurchased = false;
+
     protected override void Initialize()
     {
         base.Initialize();
@@ -17,6 +30,8 @@ public class UIGameOver : UIPanel
         base.AddListeners();
 
         EventsManager.OnGameOver.AddListener(OnGameOver);
+        EventsManager.OnDoublePointsPurchased.AddListener(OnDoublePointsPurchased);
+        EventsManager.OnTriplePointsPurchased.AddListener(OnTriplePointsPurchased);
     }
 
     protected override void RemoveListeners()
@@ -24,6 +39,24 @@ public class UIGameOver : UIPanel
         base.RemoveListeners();
 
         EventsManager.OnGameOver.RemoveListener(OnGameOver);
+        EventsManager.OnDoublePointsPurchased.RemoveListener(OnDoublePointsPurchased);
+        EventsManager.OnTriplePointsPurchased.RemoveListener(OnTriplePointsPurchased);
+    }
+
+    private void OnDoublePointsPurchased()
+    {
+        if (!tripleMultiplierPurchased)
+        {
+            multiplierContent.SetActive(true);
+            multiplierText.text = "x2"; 
+        }
+    }
+
+    private void OnTriplePointsPurchased()
+    {
+        tripleMultiplierPurchased = true;
+        multiplierContent.SetActive(true);
+        multiplierText.text = "x3";
     }
 
     /// <summary>

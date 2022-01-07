@@ -78,10 +78,11 @@ public class GameManager : MonoBehaviour
     {
         Time.timeScale = 0;
 
-        totalGoldCoins += score * multiplier;
+        var scoreMultiplied = score * multiplier;
+        totalGoldCoins += scoreMultiplied;
 
         EventsManager.OnNewTotalGoldCoins.Invoke(totalGoldCoins);
-        EventsManager.OnGoldCoinsWon.Invoke(score);
+        EventsManager.OnGoldCoinsWon.Invoke(scoreMultiplied);
     }
 
     /// <summary>

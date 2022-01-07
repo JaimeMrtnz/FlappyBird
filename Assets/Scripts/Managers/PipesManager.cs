@@ -19,6 +19,9 @@ public class PipesManager : MonoBehaviour
     private float initSpeed;
 
     [SerializeField]
+    private float speedUpSpeed;
+
+    [SerializeField]
     private uint amount;
 
     [Range(0, 2)]
@@ -27,10 +30,12 @@ public class PipesManager : MonoBehaviour
 
     private Pooler pipesPooler;
     private float currentTime = 0;
+    private float currentSpeed;
 
     private void Awake()
     {
         pipesPooler = new Pooler(pipesPrefab, content, amount);
+        currentSpeed = initSpeed;
         pipesPooler.SpawnObjects();
 
         AddListeners();
@@ -58,17 +63,20 @@ public class PipesManager : MonoBehaviour
     private void AddListeners()
     {
         EventsManager.OnReplay.AddListener(OnReplay);
+        EventsManager.OnSpeedUp.AddListener(OnSpeedUp);
+        EventsManager.OnFinishSpeedUp.AddListener(OnFinishSpeedUp);
     }
 
     private void RemoveListeners()
     {
         EventsManager.OnReplay.RemoveListener(OnReplay);
+        EventsManager.OnSpeedUp.RemoveListener(OnSpeedUp);
+        EventsManager.OnFinishSpeedUp.RemoveListener(OnFinishSpeedUp);
     }
 
     /// <summary>
     /// On replay event listener
     /// </summary>
-    /// <exception cref="NotImplementedException"></exception>
     private void OnReplay()
     {
         currentTime = 0;
@@ -77,11 +85,27 @@ public class PipesManager : MonoBehaviour
     }
 
     /// <summary>
+    /// On speed up event listener
+    /// </summary>
+    private void OnSpeedUp()
+    {
+        currentSpeed = speedUpSpeed;
+    }
+
+    /// <summary>
+    /// On finish speed up event listener
+    /// </summary>
+    private void OnFinishSpeedUp()
+    {
+        currentSpeed = initSpeed;
+    }
+
+    /// <summary>
     /// Gets a pipe from pool and activates it
     /// </summary>
     private void ActivatePipe()
     {
         var pipe = pipesPooler.GetObject().GetComponent<PipeController>();
-        pipe.Ready(initSpeed, rangeHeight);
+        pipe.Ready(currentSpeed, speedUpSpeed, rangeHeight);
     }
 }

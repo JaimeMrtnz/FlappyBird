@@ -1,6 +1,5 @@
 using PlayFab;
 using PlayFab.ClientModels;
-using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using UnityEngine;
@@ -73,7 +72,7 @@ public class PlayFabInventoryManager
 
     private static void OnAddVirtualCurrencySuccess(ModifyUserVirtualCurrencyResult successResult)
     {
-
+        EventsManager.OnRefreshInventory.Invoke();
     }
 
     private static void OnAddVirtualCurrencyError(PlayFabError error)
@@ -97,6 +96,7 @@ public class PlayFabInventoryManager
 
     private static void OnConsumeItemSuccess(ConsumeItemResult result)
     {
+        EventsManager.OnRefreshInventory.Invoke();
     }
 
     private static void OnCosumeItemError(PlayFabError error)

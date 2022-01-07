@@ -55,5 +55,6 @@ public class PlayFabPurchaseManager
     {
         Debug.Log("Error purchasing item: ");
         Debug.Log(error.ErrorMessage);
+        EventsManager.OnError.Invoke(error.ErrorMessage);
     }
 }

@@ -1,6 +1,6 @@
 using PlayFab.ClientModels;
+using System.Collections.Generic;
 using UnityEngine.Events;
-using static PlayFabInventoryManager;
 
 /// <summary>
 /// Stores global events
@@ -17,18 +17,24 @@ public class EventsManager
     public static UnityEvent<uint> OnNewTotalGems               = new UnityEvent<uint>();
     public static UnityEvent<uint> OnGoldCoinsWon               = new UnityEvent<uint>();
     public static UnityEvent<uint> OnGemsWon                    = new UnityEvent<uint>();
+    public static UnityEvent OnSpeedUp                          = new UnityEvent();
+    public static UnityEvent OnFinishSpeedUp                    = new UnityEvent();
+    public static UnityEvent OnSpeedUpClicked                   = new UnityEvent();
+    public static UnityEvent<string> OnError                    = new UnityEvent<string>();
 
     // Online
     public static UnityEvent OnLoginSuccess                                                         = new UnityEvent();
-    public static UnityEvent<PlayFabPurchaseManager, UserInventory>  OnCatalogItemsReceived         = new UnityEvent<PlayFabPurchaseManager, UserInventory>();
+    public static UnityEvent OnRefreshInventory                                                     = new UnityEvent();
+    public static UnityEvent<PlayFabPurchaseManager, List<ItemInstance>>  OnCatalogItemsReceived    = new UnityEvent<PlayFabPurchaseManager, List<ItemInstance>>();
     public static UnityEvent<InitialUserData> OnInitialUserDataRetrieved                            = new UnityEvent<InitialUserData>();
     public static UnityEvent<string> OnItemClicked                                                  = new UnityEvent<string>();
     public static UnityEvent<ItemInstance> OnItemPurchased                                          = new UnityEvent<ItemInstance>();
     public static UnityEvent<uint> OnGoldCoinsReceived                                              = new UnityEvent<uint>();
     public static UnityEvent<uint> OnGemsReceived                                                   = new UnityEvent<uint>();
-
+   
     // Power ups
     public static UnityEvent OnDoublePointsPurchased    = new UnityEvent();
     public static UnityEvent OnTriplePointsPurchased    = new UnityEvent();
+    public static UnityEvent OnSpeedUpPurchased         = new UnityEvent();
 
 }

@@ -41,6 +41,7 @@ public class OnlineManager : MonoBehaviour
         EventsManager.OnGoldCoinsWon.AddListener(OnGoldCoinsWon);
         EventsManager.OnGemsWon.AddListener(OnGemsWon);
         EventsManager.OnItemPurchased.AddListener(OnItemPurchased);
+        EventsManager.OnRefreshInventory.AddListener(OnRefreshInventory);
     }
 
     private void RemoveListeners()
@@ -51,6 +52,7 @@ public class OnlineManager : MonoBehaviour
         EventsManager.OnGoldCoinsWon.RemoveListener(OnGoldCoinsWon);
         EventsManager.OnGemsWon.RemoveListener(OnGemsWon);
         EventsManager.OnItemPurchased.RemoveListener(OnItemPurchased);
+        EventsManager.OnRefreshInventory.RemoveListener(OnRefreshInventory);
     }
 
     /// <summary>
@@ -71,7 +73,7 @@ public class OnlineManager : MonoBehaviour
 
         var items = await PlayFabCatalogManager.GetItems(userData);
         playFabPurchase = new PlayFabPurchaseManager(userData.SoftCurrency, userData.HardCurrency, userData.StoreId, items);
-        await RefreshInventory();
+        OnRefreshInventory();
     }
 
     /// <summary>
@@ -112,12 +114,16 @@ public class OnlineManager : MonoBehaviour
     /// </summary>
     /// <param name="itemID"></param>
     /// <param name="purchased"></param>
-    private async void OnItemPurchased(ItemInstance item)
+    private void OnItemPurchased(ItemInstance item)
     {
-        if (item.RemainingUses != null)
-        {
-            PlayFabInventoryManager.ConsumeItem(item.ItemInstanceId, 1); 
-        }
+        OnRefreshInventory();
+    }
+
+    /// <summary>
+    /// Refreshes the inventory
+    /// </summary>
+    private async void OnRefreshInventory()
+    {
         await RefreshInventory();
     }
 
@@ -129,7 +135,7 @@ public class OnlineManager : MonoBehaviour
     private async Task RefreshInventory()
     {
         inventory = await PlayFabInventoryManager.GetUserInventory();
-        EventsManager.OnCatalogItemsReceived.Invoke(playFabPurchase, inventory);
+        EventsManager.OnCatalogItemsReceived.Invoke(playFabPurchase, inventory.Inventory);
         EventsManager.OnGoldCoinsReceived.Invoke((uint)inventory.CurrenciesBalances[playFabPurchase.SoftCurrency]);
         EventsManager.OnGemsReceived.Invoke((uint)inventory.CurrenciesBalances[playFabPurchase.HardCurrency]);
     }

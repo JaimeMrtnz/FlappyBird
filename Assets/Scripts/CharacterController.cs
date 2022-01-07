@@ -9,10 +9,26 @@ public class CharacterController : MonoBehaviour
     private Rigidbody2D rb;
 
     [SerializeField]
+    private SpriteRenderer sr;
+
+    [SerializeField]
+    private CapsuleCollider2D capCollider;
+
+    [SerializeField]
     private float speed;
+
+    [SerializeField]
+    private Color speedUpColor;
+
+    [SerializeField]
+    private Color normalColor;
+
+    private float normalGravity;
 
     private void Start()
     {
+        normalGravity = rb.gravityScale;
+
         AddListeners();
     }
 
@@ -26,6 +42,10 @@ public class CharacterController : MonoBehaviour
         InputManager.OnTap.AddListener(OnTap);
 
         EventsManager.OnReplay.AddListener(OnReplay);
+
+        EventsManager.OnSpeedUp.AddListener(OnSpeedUp);
+
+        EventsManager.OnFinishSpeedUp.AddListener(OnFinishSpeedUp);
     }
 
     private void RemoveListeners()
@@ -33,6 +53,10 @@ public class CharacterController : MonoBehaviour
         InputManager.OnTap.RemoveListener(OnTap);
 
         EventsManager.OnReplay.RemoveListener(OnReplay);
+
+        EventsManager.OnSpeedUp.RemoveListener(OnSpeedUp);
+
+        EventsManager.OnFinishSpeedUp.RemoveListener(OnFinishSpeedUp);
     }
 
     /// <summary>
@@ -49,6 +73,23 @@ public class CharacterController : MonoBehaviour
     private void OnReplay()
     {
         transform.position = Vector3.zero;
+    }
+
+    /// <summary>
+    /// On speed up event listener
+    /// </summary>
+    private void OnSpeedUp()
+    {
+        sr.color = speedUpColor;
+    }
+
+    /// <summary>
+    /// On finish speed up event listener
+    /// returns to normal state
+    /// </summary>
+    private void OnFinishSpeedUp()
+    {
+        sr.color = normalColor;
     }
 
     /// <summary>

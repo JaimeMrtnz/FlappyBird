@@ -92,18 +92,14 @@ public class UIItemObjController : MonoBehaviour
     {
         if (this.itemID.Equals(itemID))
         {
-            if (purchased)
+            if (consumableInfo.UsageCount == null)
             {
-                if (consumableInfo.UsageCount > 0)
-                {
-
-                }
-                else
-                {
-
-                }
                 background.color = purchased ? purchasedColor : notPurchasedColor;
                 button.interactable = purchased ? false : true;
+            }
+            else
+            {
+
             }
         }
     }
