@@ -22,6 +22,9 @@ public class UIItemObjController : MonoBehaviour
     [SerializeField]
     private RectTransform layoutRoot;
 
+    [SerializeField]
+    private GameObject timer;
+
     [Header("Gold Coins")]
     [SerializeField]
     private GameObject goldCoinContent;
@@ -44,15 +47,22 @@ public class UIItemObjController : MonoBehaviour
     [SerializeField]
     private Color purchasedColor;
 
+    private IParser parser;
+
     private string itemID;
+
+    private CatalogItemCustomData customData;
 
     public string ButtonText { set => buttonText.text = value; }
     public string ItemID { get => itemID; set => itemID = value; }
 
     public void Initialize()
     {
+        parser = new UnityJsonUtilityAdapter();
+
         goldCoinContent.SetActive(false);
         hardCurrencyContent.SetActive(false);
+        timer.SetActive(false);
     }
 
     /// <summary>
@@ -97,11 +107,16 @@ public class UIItemObjController : MonoBehaviour
                 background.color = purchased ? purchasedColor : notPurchasedColor;
                 button.interactable = purchased ? false : true;
             }
-            else
-            {
-
-            }
         }
+    }
+
+    /// <summary>
+    /// Parses custom data of the item related to this
+    /// </summary>
+    /// <param name="customData"></param>
+    public void SetCustomData(string customData)
+    {
+        this.customData = parser.Deserialize<CatalogItemCustomData>(customData);
     }
 
     /// <summary>
@@ -109,6 +124,6 @@ public class UIItemObjController : MonoBehaviour
     /// </summary>
     public void OnClick()
     {
-        EventsManager.OnItemClicked.Invoke(itemID);
+        EventsManager.OnItemClicked.Invoke(itemID, uint.Parse(customData.Timer));
     }
 }

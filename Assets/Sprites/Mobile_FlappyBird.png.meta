@@ -472,7 +472,7 @@ TextureImporter:
         width: 23
         height: 22
       alignment: 0
-      pivot: {x: 0, y: 0}
+      pivot: {x: 0.5, y: 0.5}
       border: {x: 1, y: 0, z: 0, w: 0}
       outline: []
       physicsShape: []
@@ -480,6 +480,69 @@ TextureImporter:
       bones: []
       spriteID: e70df55a18710894abc95e20bfc06d2e
       internalID: 127949558
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: red_bird_2
+      rect:
+        serializedVersion: 2
+        x: 115
+        y: 67
+        width: 17
+        height: 12
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 8fe7699dce017f247b81c6b5e322e623
+      internalID: 1630091145
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: red_bird_0
+      rect:
+        serializedVersion: 2
+        x: 115
+        y: 119
+        width: 17
+        height: 12
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 364a7fc8d42431245bfae4174b5e1c36
+      internalID: -1454541889
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: red_bird_1
+      rect:
+        serializedVersion: 2
+        x: 115
+        y: 93
+        width: 17
+        height: 12
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 451c3a6c59e780d49a1180adf7efdb32
+      internalID: 1150376283
       vertices: []
       indices: 
       edges: []
@@ -498,6 +561,7 @@ TextureImporter:
       ok_button: 1607741062
       pipe_down_day: 1274597230
       menu_button: -2016527199
+      red_bird_1: 1150376283
       gold_coin: 127949558
       game_over: -875938700
       pipe_up_day: -1854039405
@@ -505,11 +569,14 @@ TextureImporter:
       background_day: -1737303027
       rate_button: -2056789068
       flappy_bird_logo: -1849129381
+      red_bird_0: -1454541889
       ground: -1969459856
       get_ready: 755095972
       leaderboard: 1229865842
       background_night: 258308489
+      Mobile_FlappyBird_0: -1927560722
       play: 325880050
+      red_bird_2: 1630091145
       bird_0: 1984219734
       bird_1: -319933670
   spritePackingTag: 

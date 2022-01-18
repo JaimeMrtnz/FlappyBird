@@ -72,7 +72,7 @@ public class OnlineManager : MonoBehaviour
         userData = initialUserData;
 
         var items = await PlayFabCatalogManager.GetItems(userData);
-        playFabPurchase = new PlayFabPurchaseManager(userData.SoftCurrency, userData.HardCurrency, userData.StoreId, items);
+        playFabPurchase = new PlayFabPurchaseManager(userData.SoftCurrency, userData.HardCurrency, userData.StoreId, items, new UnityJsonUtilityAdapter());
         OnRefreshInventory();
     }
 
@@ -104,7 +104,7 @@ public class OnlineManager : MonoBehaviour
     /// Purchases an item
     /// </summary>
     /// <param name="itemID"></param>
-    private void OnItemClicked(string itemID)
+    private void OnItemClicked(string itemID, uint timer)
     {
         playFabPurchase.PurchaseItem(itemID);
     }
@@ -114,7 +114,7 @@ public class OnlineManager : MonoBehaviour
     /// </summary>
     /// <param name="itemID"></param>
     /// <param name="purchased"></param>
-    private void OnItemPurchased(ItemInstance item)
+    private void OnItemPurchased(ItemInstance item, CatalogItem_CatalogCustomData catalogItem)
     {
         OnRefreshInventory();
     }

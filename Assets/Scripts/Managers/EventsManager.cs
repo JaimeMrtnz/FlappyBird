@@ -20,6 +20,7 @@ public class EventsManager
     public static UnityEvent OnSpeedUp                          = new UnityEvent();
     public static UnityEvent OnFinishSpeedUp                    = new UnityEvent();
     public static UnityEvent OnSpeedUpClicked                   = new UnityEvent();
+    public static UnityEvent<string, uint> OnItemTimer          = new UnityEvent<string, uint>();
     public static UnityEvent<string> OnError                    = new UnityEvent<string>();
 
     // Online
@@ -27,8 +28,8 @@ public class EventsManager
     public static UnityEvent OnRefreshInventory                                                     = new UnityEvent();
     public static UnityEvent<PlayFabPurchaseManager, List<ItemInstance>>  OnCatalogItemsReceived    = new UnityEvent<PlayFabPurchaseManager, List<ItemInstance>>();
     public static UnityEvent<InitialUserData> OnInitialUserDataRetrieved                            = new UnityEvent<InitialUserData>();
-    public static UnityEvent<string> OnItemClicked                                                  = new UnityEvent<string>();
-    public static UnityEvent<ItemInstance> OnItemPurchased                                          = new UnityEvent<ItemInstance>();
+    public static UnityEvent<string, uint> OnItemClicked                                            = new UnityEvent<string, uint>();
+    public static UnityEvent<ItemInstance, CatalogItem_CatalogCustomData> OnItemPurchased           = new UnityEvent<ItemInstance, CatalogItem_CatalogCustomData>();
     public static UnityEvent<uint> OnGoldCoinsReceived                                              = new UnityEvent<uint>();
     public static UnityEvent<uint> OnGemsReceived                                                   = new UnityEvent<uint>();
    

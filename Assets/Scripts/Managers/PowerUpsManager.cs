@@ -37,47 +37,50 @@ public class PowerUpsManager : MonoBehaviour
         EventsManager.OnSpeedUpClicked.RemoveListener(OnSpeedUpClicked);
     }
 
-    private void OnItemPurchased(ItemInstance item)
+    private void OnItemPurchased(ItemInstance item, CatalogItem_CatalogCustomData catalogItem)
     {
-        FilterByItem(item);
+        FilterByItem(item, catalogItem);
     }
 
     private void OnCatalogItemsReceived(PlayFabPurchaseManager playFabPurchaseManager, List<ItemInstance> inventory)
     {
-        RefreshPowerUpsInventory(inventory);
+        RefreshPowerUpsInventory(inventory, playFabPurchaseManager.ItemsCollection);
     }
 
-    private void RefreshPowerUpsInventory(List<ItemInstance> inventory)
+    private void RefreshPowerUpsInventory(List<ItemInstance> inventory, Dictionary<string, CatalogItem_CatalogCustomData> items)
     {
         foreach (var item in inventory)
         {
-            FilterByItem(item);
+            FilterByItem(item, items[item.ItemId]);
         }
     }
 
-    private void FilterByItem(ItemInstance item)
+    private void FilterByItem(ItemInstance item, CatalogItem_CatalogCustomData catalogItem)
     {
+        powerUpsPurchased.TryAdd(item.ItemId, item);
+
         switch (item.ItemId)
         {
             case "doublePoints":
-                powerUpsPurchased.TryAdd(item.ItemId, item);
                 EventsManager.OnDoublePointsPurchased.Invoke();
                 break;
 
             case "triplePoints":
-                powerUpsPurchased.TryAdd(item.ItemId, item);
                 EventsManager.OnTriplePointsPurchased.Invoke();
                 break;
 
             case "speedUp":
-                powerUpsPurchased.TryAdd(item.ItemId, item);
                 EventsManager.OnSpeedUpPurchased.Invoke();
                 break;
 
             case "5Gems":
-                powerUpsPurchased.TryAdd(item.ItemId, item);
                 EventsManager.OnGemsWon.Invoke(5);
                 PlayFabInventoryManager.ConsumeItem(item.ItemInstanceId, 1);
+                break;
+
+            case "redBird":
+                EventsManager.OnItemTimer.Invoke(item.ItemId, uint.Parse(catalogItem.CustomData.Timer));
+
                 break;
         }
     }

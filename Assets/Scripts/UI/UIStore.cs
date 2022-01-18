@@ -33,7 +33,6 @@ public class UIStore : UIPanel
         base.AddListeners();
 
         EventsManager.OnCatalogItemsReceived.AddListener(OnStoreItemsReceived);
-        //EventsManager.OnItemPurchased.AddListener(OnItemPurchased);
     }
 
     protected override void RemoveListeners()
@@ -41,7 +40,6 @@ public class UIStore : UIPanel
         base.RemoveListeners();
 
         EventsManager.OnCatalogItemsReceived.RemoveListener(OnStoreItemsReceived);
-        //EventsManager.OnItemPurchased.RemoveListener(OnItemPurchased);
     }
 
     /// <summary>
@@ -54,16 +52,6 @@ public class UIStore : UIPanel
         this.inventory = inventory;
         RefreshItems();
     }
-
-    /// <summary>
-    /// On item purchase event listener
-    /// </summary>
-    /// <param name="item"></param>
-    /// <param name="purchased"></param>
-    //private void OnItemPurchased(ItemInstance item)
-    //{
-    //    RefreshItems();
-    //}
 
     /// <summary>
     /// Refreshes items in store
@@ -93,6 +81,8 @@ public class UIStore : UIPanel
             itemObj.Initialize();
 
             itemObj.SetPrice(item.VirtualCurrencyPrices);
+
+            itemObj.SetCustomData(item.CustomData);
 
             itemObj.SetPurchased(item.ItemId, item.Consumable, inventory.Any(x => x.ItemId.Equals(item.ItemId))); ;
         
