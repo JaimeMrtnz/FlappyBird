@@ -1,4 +1,5 @@
 using PlayFab.ClientModels;
+using System;
 using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
@@ -22,8 +23,15 @@ public class UIItemObjController : MonoBehaviour
     [SerializeField]
     private RectTransform layoutRoot;
 
+    [Header("Timer settings")]
     [SerializeField]
     private GameObject timer;
+
+    [SerializeField]
+    private Image timerImage;
+
+    [SerializeField]
+    private TextMeshProUGUI timerText;
 
     [Header("Gold Coins")]
     [SerializeField]
@@ -47,23 +55,67 @@ public class UIItemObjController : MonoBehaviour
     [SerializeField]
     private Color purchasedColor;
 
-    private IParser parser;
+    private string itemId;
 
-    private string itemID;
+    //private float goalTime = 0;
+    private DateTime goalTime;
+    private float goalSecs = 0;
 
-    private CatalogItemCustomData customData;
+    private bool timerConnected = false;
 
     public string ButtonText { set => buttonText.text = value; }
-    public string ItemID { get => itemID; set => itemID = value; }
+    public string ItemID { get => itemId; set => itemId = value; }
+
+    private void Awake()
+    {
+        AddListeners();
+    }
+
+    private void OnDestroy()
+    {
+        RemoveListeners();
+    }
+
+    //private void Update()
+    //{
+        //if (timerConnected)
+        //{
+        //    var diff = goalTime - DateTime.UtcNow;
+        //    if (diff.TotalSeconds > 0)
+        //    {
+        //        timerText.text = diff.ToString(@"hh\:mm\:ss");
+        //        timerImage.fillAmount = (float)(diff.TotalSeconds / goalSecs);
+        //    }
+        //    else
+        //    {
+        //        timerText.text = "00:00:00";
+        //        timerConnected = false;
+        //        timer.SetActive(false);
+
+        //        EventsManager.OnTimerCoundDownFinished.Invoke(itemId);
+        //    } 
+        //}
+    //}
 
     public void Initialize()
     {
-        parser = new UnityJsonUtilityAdapter();
-
         goldCoinContent.SetActive(false);
         hardCurrencyContent.SetActive(false);
         timer.SetActive(false);
     }
+
+    private void AddListeners()
+    {
+        EventsManager.OnTimerTick.AddListener(OnTimerTick);
+        EventsManager.OnTimerCoundDownFinished.AddListener(OnTimerCoundDownFinished);
+    }
+
+    private void RemoveListeners()
+    {
+        EventsManager.OnTimerTick.RemoveListener(OnTimerTick);
+        EventsManager.OnTimerCoundDownFinished.RemoveListener(OnTimerCoundDownFinished);
+    }
+
 
     /// <summary>
     /// Sets the prices given virtual and real currencies
@@ -100,7 +152,7 @@ public class UIItemObjController : MonoBehaviour
     /// <param name="purchased"></param>
     public void SetPurchased(string itemID, CatalogItemConsumableInfo consumableInfo, bool purchased)
     {
-        if (this.itemID.Equals(itemID))
+        if (this.itemId.Equals(itemID))
         {
             if (consumableInfo.UsageCount == null)
             {
@@ -111,12 +163,43 @@ public class UIItemObjController : MonoBehaviour
     }
 
     /// <summary>
-    /// Parses custom data of the item related to this
+    /// Enables the timer in this item
     /// </summary>
-    /// <param name="customData"></param>
-    public void SetCustomData(string customData)
+    /// <param name="time"></param>
+    public void SetTimer(DateTime time)
     {
-        this.customData = parser.Deserialize<CatalogItemCustomData>(customData);
+        timer.SetActive(true);
+        timerConnected = true;
+        goalTime = time;
+        goalSecs = (float)(goalTime - DateTime.UtcNow).TotalSeconds;
+    }
+
+    /// <summary>
+    /// On timer tick events handler
+    /// </summary>
+    /// <param name="itemId"></param>
+    private void OnTimerTick(string itemId)
+    {
+        if (this.itemId.Equals(itemId))
+        {
+            var diff = goalTime - DateTime.UtcNow;
+            timerText.text = diff.ToString(@"hh\:mm\:ss");
+            timerImage.fillAmount = (float)(diff.TotalSeconds / goalSecs);
+        }
+    }
+
+    /// <summary>
+    /// On timer countdown event handler
+    /// </summary>
+    /// <param name="itemId"></param>
+    private void OnTimerCoundDownFinished(string itemId)
+    {
+        if (this.itemId.Equals(itemId))
+        {
+            timerText.text = "00:00:00";
+            timerConnected = false;
+            timer.SetActive(false);
+        }
     }
 
     /// <summary>
@@ -124,6 +207,6 @@ public class UIItemObjController : MonoBehaviour
     /// </summary>
     public void OnClick()
     {
-        EventsManager.OnItemClicked.Invoke(itemID, uint.Parse(customData.Timer));
+        EventsManager.OnItemClicked.Invoke(itemId);
     }
 }

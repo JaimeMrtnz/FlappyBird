@@ -6,7 +6,7 @@ using UnityEngine;
 
 public class PlayFabCatalogManager
 {
-    public static Task<List<CatalogItem>> GetItems(InitialUserData userData)
+    public static Task<List<CatalogItem>> GetItems(InitialTitleData userData)
     {
         var t = new TaskCompletionSource<List<CatalogItem>>();
 

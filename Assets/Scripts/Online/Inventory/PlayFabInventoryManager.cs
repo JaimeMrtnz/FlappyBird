@@ -1,6 +1,5 @@
 using PlayFab;
 using PlayFab.ClientModels;
-using System.Collections.Generic;
 using System.Threading.Tasks;
 using UnityEngine;
 
@@ -9,33 +8,16 @@ using UnityEngine;
 /// </summary>
 public class PlayFabInventoryManager 
 {
-    public class UserInventory
-    {
-        public List<ItemInstance> Inventory;
-        public Dictionary<string, int> CurrenciesBalances;
-
-        public UserInventory(List<ItemInstance> newInventory, Dictionary<string, int> newBalances)
-        {
-            Inventory = newInventory;
-
-            CurrenciesBalances = newBalances;
-        }
-    }
-
     /// <summary>
     /// Returns the user inventory
     /// </summary>
     /// <returns></returns>
-    public static Task<UserInventory> GetUserInventory()
+    public static void GetUserInventory()
     {
-        var t = new TaskCompletionSource<UserInventory>();
-
         PlayFabClientAPI.GetUserInventory(new GetUserInventoryRequest(),
-        successResult => OnGetUserInventorySuccess(successResult, t),
-        error => OnGetUserInventoryError(error, t)
+        successResult => OnGetUserInventorySuccess(successResult),
+        error => OnGetUserInventoryError(error)
         );
-
-        return Task.Run(() => t.Task);
     }
 
     /// <summary>
@@ -81,15 +63,14 @@ public class PlayFabInventoryManager
         Debug.Log(error.ErrorMessage);
     }
 
-    private static void OnGetUserInventorySuccess(GetUserInventoryResult successResult, TaskCompletionSource<UserInventory> t)
+    private static void OnGetUserInventorySuccess(GetUserInventoryResult successResult)
     {
         var userInventory = new UserInventory(successResult.Inventory, successResult.VirtualCurrency);
-        t.SetResult(userInventory);
+        EventsManager.OnGetUserInventorySuccess.Invoke(userInventory);
     }
 
-    private static void OnGetUserInventoryError(PlayFabError error, TaskCompletionSource<UserInventory> t)
+    private static void OnGetUserInventoryError(PlayFabError error)
     {
-        t.SetResult(null);
         Debug.Log("Error retrieving inventory items: ");
         Debug.Log(error.ErrorMessage);
     }

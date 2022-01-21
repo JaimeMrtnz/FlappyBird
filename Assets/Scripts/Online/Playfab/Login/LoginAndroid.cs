@@ -16,7 +16,7 @@ public sealed class LoginAndroid : LoginMethod
 
     protected override void OnLoginSuccess(LoginResult result)
     {
-        EventsManager.OnLoginSuccess.Invoke();
+        EventsManager.OnLoginSuccess.Invoke(result);
     }
 
     protected override void OnLoginFailure(PlayFabError error)

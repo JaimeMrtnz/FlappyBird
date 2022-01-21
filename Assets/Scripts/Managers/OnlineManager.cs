@@ -1,26 +1,36 @@
+using PlayFab;
 using PlayFab.ClientModels;
 using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 using UnityEngine;
-using static PlayFabInventoryManager;
 
 /// <summary>
 /// Manages every online step
 /// </summary>
 public class OnlineManager : MonoBehaviour
 {
-    private PlayFabTitleDataRetriever playFabDataRetriever;
+    [SerializeField]
+    private ItemsQueueManager itemsQueueManager;
+
+    [SerializeField]
+    private TimersManager timersManager;
+
+    private string playFabId;
+    private PlayFabAuthenticationContext authenticationContext;
+    private PlayFabDataRetriever playFabDataRetriever;
     private PlayFabPurchaseManager playFabPurchase;
 
     private UserInventory inventory;
-    private InitialUserData userData;
+    private InitialTitleData titleData;
+    private Dictionary<string, DateTime> timers;
+    private Dictionary<string, UserDataRecord> userData;
+
 
     private void Awake()
     {
         Initialize();
         AddListeners();
-
-        PlayFabLoginManager.LogIn();
     }
 
     private void OnDestroy()
@@ -30,57 +40,76 @@ public class OnlineManager : MonoBehaviour
 
     private void Initialize()
     {
-        playFabDataRetriever = new PlayFabTitleDataRetriever("initialUserData_V1_0_0", new UnityJsonUtilityAdapter());
+        PlayFabLoginManager.LogIn();
     }
 
     private void AddListeners()
     {
         EventsManager.OnLoginSuccess.AddListener(OnLoginSuccess);
-        EventsManager.OnInitialUserDataRetrieved.AddListener(OnInitialUserDataRetrieved);
+        EventsManager.OnInitialTitleDataRetrieved.AddListener(OnInitialTitleDataRetrieved);
+        EventsManager.OnUserDataRetrieved.AddListener(OnUserDataRetrieved);
         EventsManager.OnItemClicked.AddListener(OnItemClicked);
         EventsManager.OnGoldCoinsWon.AddListener(OnGoldCoinsWon);
         EventsManager.OnGemsWon.AddListener(OnGemsWon);
         EventsManager.OnItemPurchased.AddListener(OnItemPurchased);
         EventsManager.OnRefreshInventory.AddListener(OnRefreshInventory);
+        EventsManager.OnGetUserInventorySuccess.AddListener(OnGetUserInventorySuccess);
+        EventsManager.OnTimerCoundDownFinished.AddListener(OnTimerCoundDownFinished);
     }
 
     private void RemoveListeners()
     {
         EventsManager.OnLoginSuccess.RemoveListener(OnLoginSuccess);
-        EventsManager.OnInitialUserDataRetrieved.RemoveListener(OnInitialUserDataRetrieved);
+        EventsManager.OnInitialTitleDataRetrieved.RemoveListener(OnInitialTitleDataRetrieved);
+        EventsManager.OnUserDataRetrieved.RemoveListener(OnUserDataRetrieved);
         EventsManager.OnItemClicked.RemoveListener(OnItemClicked);
         EventsManager.OnGoldCoinsWon.RemoveListener(OnGoldCoinsWon);
         EventsManager.OnGemsWon.RemoveListener(OnGemsWon);
         EventsManager.OnItemPurchased.RemoveListener(OnItemPurchased);
         EventsManager.OnRefreshInventory.RemoveListener(OnRefreshInventory);
+        EventsManager.OnGetUserInventorySuccess.RemoveListener(OnGetUserInventorySuccess);
+        EventsManager.OnTimerCoundDownFinished.RemoveListener(OnTimerCoundDownFinished);
     }
+
 
     /// <summary>
     /// On login success event listener
     /// </summary>
-    private void OnLoginSuccess()
+    private void OnLoginSuccess(LoginResult result)
     {
+        playFabId = result.PlayFabId;
+        authenticationContext = result.AuthenticationContext;
+        playFabDataRetriever = new PlayFabDataRetriever("initialUserData_V1_0_0", new UnityJsonUtilityAdapter());
         playFabDataRetriever.RetrieveTitleData();
     }
 
     /// <summary>
     /// On initial user data received
     /// </summary>
-    /// <param name="initialUserData"></param>
-    private async void OnInitialUserDataRetrieved(InitialUserData initialUserData)
+    /// <param name="initialtitleData"></param>
+    private async void OnInitialTitleDataRetrieved(InitialTitleData initialtitleData)
     {
-        userData = initialUserData;
+        titleData = initialtitleData;
 
-        var items = await PlayFabCatalogManager.GetItems(userData);
-        playFabPurchase = new PlayFabPurchaseManager(userData.SoftCurrency, userData.HardCurrency, userData.StoreId, items, new UnityJsonUtilityAdapter());
+        var items = await PlayFabCatalogManager.GetItems(titleData);
+        playFabPurchase = new PlayFabPurchaseManager(titleData.SoftCurrency, titleData.HardCurrency, titleData.StoreId, items, new UnityJsonUtilityAdapter());
+        playFabDataRetriever.RetrieveUserData(playFabId);
+    }
+
+    /// <summary>
+    /// On data user received
+    /// </summary>
+    /// <param name="userData"></param>
+    private void OnUserDataRetrieved(Dictionary<string, UserDataRecord> userData)
+    {
+        this.userData = userData;
         OnRefreshInventory();
     }
 
     /// <summary>
     /// On gold coins won
     /// </summary>
-    /// <param name="arg0"></param>
-    /// <exception cref="NotImplementedException"></exception>
+    /// <param name="value"></param>
     private void OnGoldCoinsWon(uint value)
     {
         /// ATTENTION: this is done here due to is was asked not to use CloudScript
@@ -91,8 +120,7 @@ public class OnlineManager : MonoBehaviour
     /// <summary>
     /// On gems won
     /// </summary>
-    /// <param name="arg0"></param>
-    /// <exception cref="NotImplementedException"></exception>
+    /// <param name="value></param>
     private void OnGemsWon(uint value)
     {
         /// ATTENTION: this is done here due to is was asked not to use CloudScript
@@ -104,9 +132,16 @@ public class OnlineManager : MonoBehaviour
     /// Purchases an item
     /// </summary>
     /// <param name="itemID"></param>
-    private void OnItemClicked(string itemID, uint timer)
+    private void OnItemClicked(string itemID)
     {
-        playFabPurchase.PurchaseItem(itemID);
+        if (itemsQueueManager.CanAddItem())
+        {
+            playFabPurchase.PurchaseItem(itemID); 
+        }
+        else
+        {
+            EventsManager.OnError.Invoke(string.Format("Only {0} items at the same time", itemsQueueManager.QueueSize));
+        }
     }
 
     /// <summary>
@@ -119,12 +154,17 @@ public class OnlineManager : MonoBehaviour
         OnRefreshInventory();
     }
 
+    private void OnTimerCoundDownFinished(string itemId)
+    {
+        new PlayFabTimer().RemoveItemTimer(authenticationContext, itemId);
+    }
+
     /// <summary>
     /// Refreshes the inventory
     /// </summary>
-    private async void OnRefreshInventory()
+    private void OnRefreshInventory()
     {
-        await RefreshInventory();
+        RefreshInventory();
     }
 
     /// <summary>
@@ -132,11 +172,30 @@ public class OnlineManager : MonoBehaviour
     /// </summary>
     /// <param name="items"></param>
     /// <returns></returns>
-    private async Task RefreshInventory()
+    private void RefreshInventory()
     {
-        inventory = await PlayFabInventoryManager.GetUserInventory();
+        PlayFabInventoryManager.GetUserInventory();
+    }
+
+    private void OnGetUserInventorySuccess(UserInventory userInventory)
+    {
+        this.inventory = userInventory;
         EventsManager.OnCatalogItemsReceived.Invoke(playFabPurchase, inventory.Inventory);
         EventsManager.OnGoldCoinsReceived.Invoke((uint)inventory.CurrenciesBalances[playFabPurchase.SoftCurrency]);
         EventsManager.OnGemsReceived.Invoke((uint)inventory.CurrenciesBalances[playFabPurchase.HardCurrency]);
+
+        ManageTimers(userData);
+
+        EventsManager.OnGameLoaded.Invoke();
+    }
+
+    /// <summary>
+    /// Filters and handles timers
+    /// </summary>
+    /// <param name="userData"></param>
+    private void ManageTimers(Dictionary<string, UserDataRecord> userData)
+    {
+        timers = UserDataFilter.GetTimers(userData);
+        timersManager.HandleTimers(timers);
     }
 }

@@ -1,4 +1,5 @@
 using PlayFab.ClientModels;
+using System;
 using System.Collections.Generic;
 using UnityEngine.Events;
 
@@ -20,16 +21,22 @@ public class EventsManager
     public static UnityEvent OnSpeedUp                          = new UnityEvent();
     public static UnityEvent OnFinishSpeedUp                    = new UnityEvent();
     public static UnityEvent OnSpeedUpClicked                   = new UnityEvent();
-    public static UnityEvent<string, uint> OnItemTimer          = new UnityEvent<string, uint>();
+    public static UnityEvent OnGameLoaded                       = new UnityEvent();
+    public static UnityEvent<int> OnNewSkin                     = new UnityEvent<int>();
+    public static UnityEvent<string> OnTimerTick                = new UnityEvent<string>();
+    public static UnityEvent<string> OnTimerCoundDownFinished   = new UnityEvent<string>();
     public static UnityEvent<string> OnError                    = new UnityEvent<string>();
 
     // Online
-    public static UnityEvent OnLoginSuccess                                                         = new UnityEvent();
+    public static UnityEvent<LoginResult> OnLoginSuccess                                            = new UnityEvent<LoginResult>();
     public static UnityEvent OnRefreshInventory                                                     = new UnityEvent();
     public static UnityEvent<PlayFabPurchaseManager, List<ItemInstance>>  OnCatalogItemsReceived    = new UnityEvent<PlayFabPurchaseManager, List<ItemInstance>>();
-    public static UnityEvent<InitialUserData> OnInitialUserDataRetrieved                            = new UnityEvent<InitialUserData>();
-    public static UnityEvent<string, uint> OnItemClicked                                            = new UnityEvent<string, uint>();
+    public static UnityEvent<UserInventory> OnGetUserInventorySuccess                               = new UnityEvent<UserInventory>();
+    public static UnityEvent<InitialTitleData> OnInitialTitleDataRetrieved                          = new UnityEvent<InitialTitleData>();
+    public static UnityEvent<Dictionary<string, UserDataRecord>> OnUserDataRetrieved                = new UnityEvent<Dictionary<string, UserDataRecord>>();
+    public static UnityEvent<string> OnItemClicked                                                  = new UnityEvent<string>();
     public static UnityEvent<ItemInstance, CatalogItem_CatalogCustomData> OnItemPurchased           = new UnityEvent<ItemInstance, CatalogItem_CatalogCustomData>();
+    public static UnityEvent<string, float, DateTime> OnItemTimerSuccess                            = new UnityEvent<string, float, DateTime>();
     public static UnityEvent<uint> OnGoldCoinsReceived                                              = new UnityEvent<uint>();
     public static UnityEvent<uint> OnGemsReceived                                                   = new UnityEvent<uint>();
    

@@ -495,9 +495,9 @@ RectTransform:
   m_Father: {fileID: 848842533539346831}
   m_RootOrder: 1
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
-  m_AnchorMin: {x: 0, y: 0}
-  m_AnchorMax: {x: 0, y: 0}
-  m_AnchoredPosition: {x: 80, y: 0}
+  m_AnchorMin: {x: 0, y: 1}
+  m_AnchorMax: {x: 0, y: 1}
+  m_AnchoredPosition: {x: 80, y: -75}
   m_SizeDelta: {x: 160, y: 0}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &893268657072032176
@@ -946,6 +946,8 @@ MonoBehaviour:
   button: {fileID: 7437340904691707222}
   layoutRoot: {fileID: 7437340904691707223}
   timer: {fileID: 8960144204651308878}
+  timerImage: {fileID: 3271297235057518577}
+  timerText: {fileID: 6517678998277564694}
   goldCoinContent: {fileID: 2914190538795241846}
   goldCoinPriceText: {fileID: 7437340903516582248}
   hardCurrencyContent: {fileID: 8647324578377415231}

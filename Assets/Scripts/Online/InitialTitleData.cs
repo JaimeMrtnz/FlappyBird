@@ -1,7 +1,7 @@
 using System;
 
 [Serializable]
-public class InitialUserData 
+public class InitialTitleData 
 {
     public string SoftCurrency;
     public string HardCurrency;

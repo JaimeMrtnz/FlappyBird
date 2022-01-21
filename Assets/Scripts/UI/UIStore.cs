@@ -1,8 +1,8 @@
 using PlayFab.ClientModels;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
-using static PlayFabInventoryManager;
 
 /// <summary>
 /// Controls the store UI
@@ -17,13 +17,13 @@ public class UIStore : UIPanel
 
     private PlayFabPurchaseManager playFabPurchase;
     private List<ItemInstance> inventory;
-    private List<UIItemObjController> itemsSpawned;
+    private Dictionary<string, UIItemObjController> itemsSpawned;
 
     protected override void Initialize()
     {
         base.Initialize();
 
-        itemsSpawned = new List<UIItemObjController>();
+        itemsSpawned = new Dictionary<string, UIItemObjController>();
 
         Hide();
     }
@@ -33,6 +33,7 @@ public class UIStore : UIPanel
         base.AddListeners();
 
         EventsManager.OnCatalogItemsReceived.AddListener(OnStoreItemsReceived);
+        EventsManager.OnItemTimerSuccess.AddListener(OnItemTimerSuccess);
     }
 
     protected override void RemoveListeners()
@@ -40,7 +41,9 @@ public class UIStore : UIPanel
         base.RemoveListeners();
 
         EventsManager.OnCatalogItemsReceived.RemoveListener(OnStoreItemsReceived);
+        EventsManager.OnItemTimerSuccess.RemoveListener(OnItemTimerSuccess);
     }
+
 
     /// <summary>
     /// On store items received event listener
@@ -54,6 +57,15 @@ public class UIStore : UIPanel
     }
 
     /// <summary>
+    /// On item timer set handler
+    /// </summary>
+    /// <param name="arg0"></param>
+    private void OnItemTimerSuccess(string itemId, float timer, DateTime time)
+    {
+        itemsSpawned[itemId].SetTimer(time);
+    }
+
+    /// <summary>
     /// Refreshes items in store
     /// </summary>
     private void RefreshItems()
@@ -62,11 +74,9 @@ public class UIStore : UIPanel
         {
             UIItemObjController itemObj = null;
 
-            var itemsFound = itemsSpawned.Where(x => x.ItemID.Equals(item.ItemId)).ToList();
-
-            if (itemsFound.Count > 0)
+            if(itemsSpawned.ContainsKey(item.ItemId))
             {
-                itemObj = itemsFound.First();
+                itemObj = itemsSpawned[item.ItemId];
             }
 
             if(itemObj == null)
@@ -82,11 +92,9 @@ public class UIStore : UIPanel
 
             itemObj.SetPrice(item.VirtualCurrencyPrices);
 
-            itemObj.SetCustomData(item.CustomData);
-
             itemObj.SetPurchased(item.ItemId, item.Consumable, inventory.Any(x => x.ItemId.Equals(item.ItemId))); ;
         
-            itemsSpawned.Add(itemObj);
+            itemsSpawned.TryAdd(item.ItemId, itemObj);
         }
     }
 }

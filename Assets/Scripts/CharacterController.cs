@@ -1,3 +1,4 @@
+using System;
 using UnityEngine;
 
 /// <summary>
@@ -5,6 +6,7 @@ using UnityEngine;
 /// </summary>
 public class CharacterController : MonoBehaviour
 {
+    [Header("Components")]
     [SerializeField]
     private Rigidbody2D rb;
 
@@ -15,6 +17,10 @@ public class CharacterController : MonoBehaviour
     private CapsuleCollider2D capCollider;
 
     [SerializeField]
+    private Animator animator;
+
+    [Header("Settings")]
+    [SerializeField]
     private float speed;
 
     [SerializeField]
@@ -23,18 +29,24 @@ public class CharacterController : MonoBehaviour
     [SerializeField]
     private Color normalColor;
 
-    private float normalGravity;
+    [Header("Skins")]
+    [SerializeField]
+    private RuntimeAnimatorController[] skinsAnimators;
 
     private void Start()
     {
-        normalGravity = rb.gravityScale;
-
+        Initialize();
         AddListeners();
     }
 
     private void OnDestroy()
     {
         RemoveListeners();
+    }
+
+    private void Initialize()
+    {
+        animator.runtimeAnimatorController = skinsAnimators[0];
     }
 
     private void AddListeners()
@@ -46,6 +58,8 @@ public class CharacterController : MonoBehaviour
         EventsManager.OnSpeedUp.AddListener(OnSpeedUp);
 
         EventsManager.OnFinishSpeedUp.AddListener(OnFinishSpeedUp);
+
+        EventsManager.OnNewSkin.AddListener(OnNewSkin);
     }
 
     private void RemoveListeners()
@@ -57,7 +71,10 @@ public class CharacterController : MonoBehaviour
         EventsManager.OnSpeedUp.RemoveListener(OnSpeedUp);
 
         EventsManager.OnFinishSpeedUp.RemoveListener(OnFinishSpeedUp);
+
+        EventsManager.OnNewSkin.RemoveListener(OnNewSkin);
     }
+
 
     /// <summary>
     /// On tap event handler
@@ -90,6 +107,15 @@ public class CharacterController : MonoBehaviour
     private void OnFinishSpeedUp()
     {
         sr.color = normalColor;
+    }
+
+    /// <summary>
+    /// On new skin event handler
+    /// </summary>
+    /// <param name="skinIndex"></param>
+    private void OnNewSkin(int skinIndex)
+    {
+        animator.runtimeAnimatorController = skinsAnimators[skinIndex];
     }
 
     /// <summary>
