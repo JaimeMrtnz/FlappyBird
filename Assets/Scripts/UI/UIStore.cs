@@ -16,7 +16,7 @@ public class UIStore : UIPanel
     private Transform content;
 
     private PlayFabPurchaseManager playFabPurchase;
-    private List<ItemInstance> inventory;
+    private Dictionary<string, ItemComponents> inventory;
     private Dictionary<string, UIItemObjController> itemsSpawned;
 
     protected override void Initialize()
@@ -32,24 +32,27 @@ public class UIStore : UIPanel
     {
         base.AddListeners();
 
-        EventsManager.OnCatalogItemsReceived.AddListener(OnStoreItemsReceived);
-        EventsManager.OnItemTimerSuccess.AddListener(OnItemTimerSuccess);
+        EventsManager.OnCatalogItemsReceivedStoreUI.AddListener(OnCatalogItemsReceived);
+        EventsManager.OnItemTimerSuccess.AddListener(OnTimerSetUp);
+        EventsManager.OnPartialTimerAdded.AddListener(OnTimerSetUp);
     }
 
     protected override void RemoveListeners()
     {
         base.RemoveListeners();
 
-        EventsManager.OnCatalogItemsReceived.RemoveListener(OnStoreItemsReceived);
-        EventsManager.OnItemTimerSuccess.RemoveListener(OnItemTimerSuccess);
+        EventsManager.OnCatalogItemsReceivedStoreUI.RemoveListener(OnCatalogItemsReceived);
+        EventsManager.OnItemTimerSuccess.RemoveListener(OnTimerSetUp);
+        EventsManager.OnPartialTimerAdded.RemoveListener(OnTimerSetUp);
     }
 
 
     /// <summary>
     /// On store items received event listener
     /// </summary>
-    /// <param name="arg0"></param>
-    private void OnStoreItemsReceived(PlayFabPurchaseManager playFabPurchase, List<ItemInstance> inventory)
+    /// <param name="playFabPurchase"></param>
+    /// <param name="inventory"></param>
+    private void OnCatalogItemsReceived(PlayFabPurchaseManager playFabPurchase, Dictionary<string, ItemComponents> inventory)
     {
         this.playFabPurchase = playFabPurchase;
         this.inventory = inventory;
@@ -59,10 +62,12 @@ public class UIStore : UIPanel
     /// <summary>
     /// On item timer set handler
     /// </summary>
-    /// <param name="arg0"></param>
-    private void OnItemTimerSuccess(string itemId, float timer, DateTime time)
+    /// <param name="itemId"></param>
+    /// <param name="timer"></param>
+    /// <param name="time"></param>
+    private void OnTimerSetUp(string itemId, float time, DateTime? timer)
     {
-        itemsSpawned[itemId].SetTimer(time);
+        itemsSpawned[itemId].SetTimer(timer.Value);
     }
 
     /// <summary>
@@ -92,7 +97,7 @@ public class UIStore : UIPanel
 
             itemObj.SetPrice(item.VirtualCurrencyPrices);
 
-            itemObj.SetPurchased(item.ItemId, item.Consumable, inventory.Any(x => x.ItemId.Equals(item.ItemId))); ;
+            itemObj.SetPurchased(item.ItemId, item.Consumable, inventory.Any(x => x.Key.Equals(item.ItemId))); ;
         
             itemsSpawned.TryAdd(item.ItemId, itemObj);
         }

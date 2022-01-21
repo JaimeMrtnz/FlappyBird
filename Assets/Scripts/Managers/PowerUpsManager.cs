@@ -48,17 +48,36 @@ public class PowerUpsManager : MonoBehaviour
         EventsManager.OnTimerCoundDownFinished.RemoveListener(OnTimerCoundDownFinished);
     }
 
+    /// <summary>
+    /// On login success event handler
+    /// </summary>
+    /// <param name="result"></param>
     private void OnLoginSuccess(LoginResult result)
     {
         authenticationContext = result.AuthenticationContext;
     }
 
+    /// <summary>
+    /// on item purchased event handler
+    /// </summary>
+    /// <param name="item"></param>
+    /// <param name="catalogItem"></param>
     private void OnItemPurchased(ItemInstance item, CatalogItem_CatalogCustomData catalogItem)
     {
-        FilterByItem(item, catalogItem);
+        var itemComponent = new ItemComponents()
+        {
+            Item = item
+        };
+
+        RefreshByItem(itemComponent, catalogItem, false);
     }
 
-    private void OnCatalogItemsReceived(PlayFabPurchaseManager playFabPurchaseManager, List<ItemInstance> inventory)
+    /// <summary>
+    /// OnCatalog item received event handler
+    /// </summary>
+    /// <param name="playFabPurchaseManager"></param>
+    /// <param name="inventory"></param>
+    private void OnCatalogItemsReceived(PlayFabPurchaseManager playFabPurchaseManager, Dictionary<string, ItemComponents> inventory)
     {
         RefreshPowerUpsInventory(inventory, playFabPurchaseManager.ItemsCollection);
     }
@@ -69,7 +88,11 @@ public class PowerUpsManager : MonoBehaviour
     /// <param name="itemId"></param>
     private void OnTimerCoundDownFinished(string itemId)
     {
-        FilterByItem(powerUpsPurchased[itemId], items[itemId], true);
+        var itemComponent = new ItemComponents()
+        {
+            Item = powerUpsPurchased[itemId]
+        };
+        RefreshByItem(itemComponent, items[itemId], true);
     }
 
     /// <summary>
@@ -89,20 +112,32 @@ public class PowerUpsManager : MonoBehaviour
     {
         EventsManager.OnFinishSpeedUp.Invoke();
     }
-    private void RefreshPowerUpsInventory(List<ItemInstance> inventory, Dictionary<string, CatalogItem_CatalogCustomData> items)
+
+    /// <summary>
+    /// Makes refresh power ups item by item
+    /// </summary>
+    /// <param name="inventory"></param>
+    /// <param name="items"></param>
+    private void RefreshPowerUpsInventory(Dictionary<string, ItemComponents> inventory, Dictionary<string, CatalogItem_CatalogCustomData> items)
     {
         this.items = items;
         foreach (var item in inventory)
         {
-            FilterByItem(item, items[item.ItemId]);
+            RefreshByItem(item.Value, items[item.Value.Item.ItemId], !item.Value.GoalTime.HasValue);
         }
     }
 
-    private void FilterByItem(ItemInstance item, CatalogItem_CatalogCustomData catalogItem, bool timerCountDown = false)
+    /// <summary>
+    /// Resfres by item
+    /// </summary>
+    /// <param name="item"></param>
+    /// <param name="catalogItem"></param>
+    /// <param name="timerFinished"></param>
+    private void RefreshByItem(ItemComponents item, CatalogItem_CatalogCustomData catalogItem, bool timerFinished)
     {
-        powerUpsPurchased.TryAdd(item.ItemId, item);
+        powerUpsPurchased.TryAdd(item.Item.ItemId, item.Item);
 
-        switch (item.ItemId)
+        switch (item.Item.ItemId)
         {
             case "doublePoints":
                 EventsManager.OnDoublePointsPurchased.Invoke();
@@ -118,18 +153,35 @@ public class PowerUpsManager : MonoBehaviour
 
             case "5Gems":
                 EventsManager.OnGemsWon.Invoke(5);
-                PlayFabInventoryManager.ConsumeItem(item.ItemInstanceId, 1);
+                PlayFabInventoryManager.ConsumeItem(item.Item.ItemInstanceId, 1);
                 break;
 
             case "redBird":
-                if (!timerCountDown)
-                {
-                    itemsQueueManager.SetItemTimer(authenticationContext, catalogItem); 
-                }
-                else
-                {
-                    EventsManager.OnNewSkin.Invoke(1);
-                }
+
+                //if (item.GoalTime.HasValue)
+                //{
+                //    if (timersManager.HasExpired(item.GoalTime))
+                //    {
+                //        EventsManager.OnNewSkin.Invoke(1);
+                //    }
+                //    else
+                //    {
+
+                //        var test = (item.GoalTime - DateTime.UtcNow).Value.TotalSeconds;
+
+                //        timersManager.NewPartialTimer(item, item.GoalTime);
+                //    }
+
+                    if (!timerFinished)
+                    {
+                        itemsQueueManager.SetItemTimer(authenticationContext, catalogItem, item);
+                    }
+                    else
+                    {
+                        EventsManager.OnNewSkin.Invoke(1);
+                    }
+                //}
+
                 break;
         }
     }

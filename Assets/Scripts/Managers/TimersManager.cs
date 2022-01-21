@@ -1,9 +1,10 @@
-using PlayFab;
 using System;
-using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
+/// <summary>
+/// Manages everything about timers
+/// </summary>
 public class TimersManager : MonoBehaviour
 {
     private MasterTickerController masterTickerController;
@@ -34,7 +35,7 @@ public class TimersManager : MonoBehaviour
         EventsManager.OnItemTimerSuccess.RemoveListener(OnItemTimerSuccess);
     }
 
-    private void OnItemTimerSuccess(string itemId, float time, DateTime goalTime)
+    private void OnItemTimerSuccess(string itemId, float time, DateTime? goalTime)
     {
         masterTickerController.NewTicker(
             time,
@@ -44,25 +45,41 @@ public class TimersManager : MonoBehaviour
             },
             (currentTime) =>
             {
-                EventsManager.OnTimerTick.Invoke(itemId);
+                EventsManager.OnTimerTick.Invoke(itemId, currentTime);
             },
             true);
     }
 
-    public void HandleTimers(Dictionary<string, DateTime> timers)
+    /// <summary>
+    /// creates a timer that begins in the middle of a past timer
+    /// this is used when a timer has not finished when start up
+    /// </summary>
+    /// <param name="item"></param>
+    public void NewPartialTimer(ItemComponents item)
     {
-        foreach (var timer in timers)
-        {
-            var t = timer.Value;
-            if(HasExpired(t))
-            {
-                EventsManager.OnTimerCoundDownFinished.Invoke(timer.Key);
-            }
-        }
+        var time = (float)(item.GoalTime - DateTime.UtcNow).Value.TotalSeconds;
+        masterTickerController.NewTicker(
+         time,
+         () =>
+         {
+             EventsManager.OnTimerCoundDownFinished.Invoke(item.Item.ItemId);
+         },
+         (currentTime) =>
+         {
+             EventsManager.OnTimerTick.Invoke(item.Item.ItemId, currentTime);
+         },
+         true);
+
+        EventsManager.OnPartialTimerAdded.Invoke(item.Item.ItemId, 0f, item.GoalTime);
     }
 
-    private bool HasExpired(DateTime time)
+    /// <summary>
+    /// checks if a date has expired
+    /// </summary>
+    /// <param name="time"></param>
+    /// <returns></returns>
+    public bool HasExpired(DateTime? time)
     {
-        return (time - DateTime.UtcNow).TotalSeconds < 0;
+        return (time.Value - DateTime.UtcNow).TotalSeconds < 0;
     }
 }

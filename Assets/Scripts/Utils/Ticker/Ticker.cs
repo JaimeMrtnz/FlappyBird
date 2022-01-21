@@ -41,7 +41,7 @@ public class Ticker
         {
             if (!reverseTimer)
             {
-                currentTime += Time.fixedDeltaTime;
+                currentTime += Time.unscaledDeltaTime;
                 tickAction?.Invoke(currentTime);
 
                 if (currentTime >= time)
@@ -52,7 +52,7 @@ public class Ticker
             }
             else
             {
-                currentTime -= Time.fixedDeltaTime;
+                currentTime -= Time.unscaledDeltaTime;
                 tickAction?.Invoke(currentTime);
 
                 if (currentTime <= 0)

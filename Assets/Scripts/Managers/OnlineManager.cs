@@ -2,7 +2,6 @@ using PlayFab;
 using PlayFab.ClientModels;
 using System;
 using System.Collections.Generic;
-using System.Threading.Tasks;
 using UnityEngine;
 
 /// <summary>
@@ -12,9 +11,6 @@ public class OnlineManager : MonoBehaviour
 {
     [SerializeField]
     private ItemsQueueManager itemsQueueManager;
-
-    [SerializeField]
-    private TimersManager timersManager;
 
     private string playFabId;
     private PlayFabAuthenticationContext authenticationContext;
@@ -103,7 +99,7 @@ public class OnlineManager : MonoBehaviour
     private void OnUserDataRetrieved(Dictionary<string, UserDataRecord> userData)
     {
         this.userData = userData;
-        OnRefreshInventory();
+        RefreshInventory();
     }
 
     /// <summary>
@@ -151,7 +147,7 @@ public class OnlineManager : MonoBehaviour
     /// <param name="purchased"></param>
     private void OnItemPurchased(ItemInstance item, CatalogItem_CatalogCustomData catalogItem)
     {
-        OnRefreshInventory();
+        RefreshInventory();
     }
 
     private void OnTimerCoundDownFinished(string itemId)
@@ -177,25 +173,21 @@ public class OnlineManager : MonoBehaviour
         PlayFabInventoryManager.GetUserInventory();
     }
 
+    /// <summary>
+    /// Get user inventory event handler success
+    /// </summary>
+    /// <param name="userInventory"></param>
     private void OnGetUserInventorySuccess(UserInventory userInventory)
     {
-        this.inventory = userInventory;
+        inventory = userInventory;
+        timers = UserDataFilter.GetTimers(userData);
+        inventory.SetTimers(timers);
+
+        EventsManager.OnCatalogItemsReceivedStoreUI.Invoke(playFabPurchase, inventory.Inventory);
         EventsManager.OnCatalogItemsReceived.Invoke(playFabPurchase, inventory.Inventory);
         EventsManager.OnGoldCoinsReceived.Invoke((uint)inventory.CurrenciesBalances[playFabPurchase.SoftCurrency]);
         EventsManager.OnGemsReceived.Invoke((uint)inventory.CurrenciesBalances[playFabPurchase.HardCurrency]);
 
-        ManageTimers(userData);
-
         EventsManager.OnGameLoaded.Invoke();
-    }
-
-    /// <summary>
-    /// Filters and handles timers
-    /// </summary>
-    /// <param name="userData"></param>
-    private void ManageTimers(Dictionary<string, UserDataRecord> userData)
-    {
-        timers = UserDataFilter.GetTimers(userData);
-        timersManager.HandleTimers(timers);
     }
 }

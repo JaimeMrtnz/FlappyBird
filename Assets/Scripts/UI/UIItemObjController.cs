@@ -57,11 +57,7 @@ public class UIItemObjController : MonoBehaviour
 
     private string itemId;
 
-    //private float goalTime = 0;
-    private DateTime goalTime;
     private float goalSecs = 0;
-
-    private bool timerConnected = false;
 
     public string ButtonText { set => buttonText.text = value; }
     public string ItemID { get => itemId; set => itemId = value; }
@@ -75,27 +71,6 @@ public class UIItemObjController : MonoBehaviour
     {
         RemoveListeners();
     }
-
-    //private void Update()
-    //{
-        //if (timerConnected)
-        //{
-        //    var diff = goalTime - DateTime.UtcNow;
-        //    if (diff.TotalSeconds > 0)
-        //    {
-        //        timerText.text = diff.ToString(@"hh\:mm\:ss");
-        //        timerImage.fillAmount = (float)(diff.TotalSeconds / goalSecs);
-        //    }
-        //    else
-        //    {
-        //        timerText.text = "00:00:00";
-        //        timerConnected = false;
-        //        timer.SetActive(false);
-
-        //        EventsManager.OnTimerCoundDownFinished.Invoke(itemId);
-        //    } 
-        //}
-    //}
 
     public void Initialize()
     {
@@ -169,22 +144,25 @@ public class UIItemObjController : MonoBehaviour
     public void SetTimer(DateTime time)
     {
         timer.SetActive(true);
-        timerConnected = true;
-        goalTime = time;
-        goalSecs = (float)(goalTime - DateTime.UtcNow).TotalSeconds;
+        goalSecs = (float)(time - DateTime.UtcNow).TotalSeconds;
     }
 
     /// <summary>
     /// On timer tick events handler
     /// </summary>
     /// <param name="itemId"></param>
-    private void OnTimerTick(string itemId)
+    private void OnTimerTick(string itemId, float time)
     {
         if (this.itemId.Equals(itemId))
         {
-            var diff = goalTime - DateTime.UtcNow;
-            timerText.text = diff.ToString(@"hh\:mm\:ss");
-            timerImage.fillAmount = (float)(diff.TotalSeconds / goalSecs);
+            var t = TimeSpan.FromSeconds(time);
+
+            timerText.text = string.Format("{0:D2}:{1:D2}:{2:D2}",
+                            t.Hours,
+                            t.Minutes,
+                            t.Seconds);
+
+            timerImage.fillAmount = time / goalSecs;
         }
     }
 
@@ -197,7 +175,6 @@ public class UIItemObjController : MonoBehaviour
         if (this.itemId.Equals(itemId))
         {
             timerText.text = "00:00:00";
-            timerConnected = false;
             timer.SetActive(false);
         }
     }

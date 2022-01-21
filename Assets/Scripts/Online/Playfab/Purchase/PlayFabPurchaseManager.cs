@@ -26,7 +26,7 @@ public class PlayFabPurchaseManager
         this.hardCurrency     = hardCurrency;
         this.storeId          = storeId;
         this.items            = new Dictionary<string, CatalogItem_CatalogCustomData>();
-        this.parser = parser;
+        this.parser           = parser;
 
         foreach (var item in items)
         {

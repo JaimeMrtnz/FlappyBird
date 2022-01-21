@@ -3,13 +3,21 @@ using System;
 using System.Collections.Generic;
 using UnityEngine;
 
+/// <summary>
+/// Class that consumes items and process them
+/// </summary>
 public class ItemsQueueManager : MonoBehaviour
 {
+    [SerializeField]
+    private TimersManager timersManager;
+
     private class QueueItem
     {
         public PlayFabAuthenticationContext AuthenticationContext;
         public CatalogItem_CatalogCustomData CatalogItem;
+        public ItemComponents ItemComponents;
     }
+
     private PlayFabTimer playFabTimer;
 
     private int queueSize = 1;
@@ -33,12 +41,28 @@ public class ItemsQueueManager : MonoBehaviour
 
             var item = queue.Dequeue();
 
-            goalTime = DateTime.UtcNow.AddSeconds(float.Parse(item.CatalogItem.CustomData.Timer));
+            if(item.ItemComponents.GoalTime.HasValue)
+            {
+                if(timersManager.HasExpired(item.ItemComponents.GoalTime))
+                {
+                    playFabTimer.RemoveItemTimer(
+                        item.AuthenticationContext,
+                        item.CatalogItem.CatalogItem.ItemId);
+                }
+                else
+                {
+                    timersManager.NewPartialTimer(item.ItemComponents);
+                }
+            }
+            else
+            {
+                goalTime = DateTime.UtcNow.AddSeconds(float.Parse(item.CatalogItem.CustomData.Timer));
 
-            playFabTimer.SetItemTimer(
-                item.AuthenticationContext, 
-                item.CatalogItem.CatalogItem.ItemId,
-                goalTime);
+                playFabTimer.SetItemTimer(
+                    item.AuthenticationContext,
+                    item.CatalogItem.CatalogItem.ItemId,
+                    goalTime);
+            }
         }
     }
 
@@ -49,7 +73,8 @@ public class ItemsQueueManager : MonoBehaviour
     /// <param name="catalogItem"></param>
     public void SetItemTimer(
         PlayFabAuthenticationContext authenticationContext, 
-        CatalogItem_CatalogCustomData catalogItem)
+        CatalogItem_CatalogCustomData catalogItem,
+        ItemComponents itemComponents)
     {
         if (CanAddItem())
         {
@@ -67,9 +92,10 @@ public class ItemsQueueManager : MonoBehaviour
                 {
                     AuthenticationContext = authenticationContext,
                     CatalogItem = catalogItem,
+                    ItemComponents = itemComponents
                 });
         }
-}
+    }
 
     /// <summary>
     /// Checks if item can be added due to the limit
