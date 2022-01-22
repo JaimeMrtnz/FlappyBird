@@ -31,6 +31,9 @@ public class UIItemObjController : MonoBehaviour
     private Image timerImage;
 
     [SerializeField]
+    private TextMeshProUGUI finishPriceText;
+
+    [SerializeField]
     private TextMeshProUGUI timerText;
 
     [Header("Gold Coins")]
@@ -59,12 +62,22 @@ public class UIItemObjController : MonoBehaviour
 
     private float goalSecs = 0;
 
+    private int gemsToFinish = 0;
+
+    private bool timerRunning = false;
+
     public string ButtonText { set => buttonText.text = value; }
     public string ItemID { get => itemId; set => itemId = value; }
 
     private void Awake()
     {
         AddListeners();
+    }
+
+    private void Update()
+    {
+        gemsToFinish = (int)PriceBalancer.GetGemsGivenSecs(goalSecs);
+        finishPriceText.text = gemsToFinish.ToString();
     }
 
     private void OnDestroy()
@@ -76,7 +89,7 @@ public class UIItemObjController : MonoBehaviour
     {
         goldCoinContent.SetActive(false);
         hardCurrencyContent.SetActive(false);
-        timer.SetActive(false);
+        timer.SetActive(timerRunning);
     }
 
     private void AddListeners()
@@ -177,6 +190,14 @@ public class UIItemObjController : MonoBehaviour
             timerText.text = "00:00:00";
             timer.SetActive(false);
         }
+    }
+
+    /// <summary>
+    /// On finish button click
+    /// </summary>
+    public void OnFinishClick()
+    {
+        EventsManager.OnFinishClicked.Invoke(itemId, gemsToFinish);
     }
 
     /// <summary>

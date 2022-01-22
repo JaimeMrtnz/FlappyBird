@@ -158,29 +158,14 @@ public class PowerUpsManager : MonoBehaviour
 
             case "redBird":
 
-                //if (item.GoalTime.HasValue)
-                //{
-                //    if (timersManager.HasExpired(item.GoalTime))
-                //    {
-                //        EventsManager.OnNewSkin.Invoke(1);
-                //    }
-                //    else
-                //    {
-
-                //        var test = (item.GoalTime - DateTime.UtcNow).Value.TotalSeconds;
-
-                //        timersManager.NewPartialTimer(item, item.GoalTime);
-                //    }
-
-                    if (!timerFinished)
-                    {
-                        itemsQueueManager.SetItemTimer(authenticationContext, catalogItem, item);
-                    }
-                    else
-                    {
-                        EventsManager.OnNewSkin.Invoke(1);
-                    }
-                //}
+                if (!timerFinished)
+                {
+                    itemsQueueManager.SetItemTimer(authenticationContext, catalogItem, item);
+                }
+                else
+                {
+                    EventsManager.OnNewSkin.Invoke(1);
+                }
 
                 break;
         }

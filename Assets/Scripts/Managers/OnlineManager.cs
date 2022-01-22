@@ -48,6 +48,7 @@ public class OnlineManager : MonoBehaviour
         EventsManager.OnInitialTitleDataRetrieved.AddListener(OnInitialTitleDataRetrieved);
         EventsManager.OnUserDataRetrieved.AddListener(OnUserDataRetrieved);
         EventsManager.OnItemClicked.AddListener(OnItemClicked);
+        EventsManager.OnFinishClicked.AddListener(OnFinishClicked);
         EventsManager.OnGoldCoinsWon.AddListener(OnGoldCoinsWon);
         EventsManager.OnGemsWon.AddListener(OnGemsWon);
         EventsManager.OnItemPurchased.AddListener(OnItemPurchased);
@@ -62,6 +63,7 @@ public class OnlineManager : MonoBehaviour
         EventsManager.OnInitialTitleDataRetrieved.RemoveListener(OnInitialTitleDataRetrieved);
         EventsManager.OnUserDataRetrieved.RemoveListener(OnUserDataRetrieved);
         EventsManager.OnItemClicked.RemoveListener(OnItemClicked);
+        EventsManager.OnFinishClicked.RemoveListener(OnFinishClicked);
         EventsManager.OnGoldCoinsWon.RemoveListener(OnGoldCoinsWon);
         EventsManager.OnGemsWon.RemoveListener(OnGemsWon);
         EventsManager.OnItemPurchased.RemoveListener(OnItemPurchased);
@@ -90,6 +92,7 @@ public class OnlineManager : MonoBehaviour
     {
         titleData = initialtitleData;
         leaderBoardManager.Initialize(authenticationContext, initialtitleData.LeaderBoardId);
+        PriceBalancer.SetGemsMin(titleData.Gems5Min);
 
         var items = await PlayFabCatalogManager.GetItems(titleData);
         playFabPurchase = new PlayFabPurchaseManager(titleData.SoftCurrency, titleData.HardCurrency, titleData.StoreId, items, new UnityJsonUtilityAdapter());
@@ -142,6 +145,15 @@ public class OnlineManager : MonoBehaviour
         {
             EventsManager.OnError.Invoke(string.Format("Only {0} items at the same time", itemsQueueManager.QueueSize));
         }
+    }
+
+    /// <summary>
+    /// Tries to finish a timer with gems
+    /// </summary>
+    /// <param name="itemId"></param>
+    private void OnFinishClicked(string itemId, int gems)
+    {
+        PlayFabInventoryManager.RemoveVirtualCurrency(itemId, gems, "GM");
     }
 
     /// <summary>

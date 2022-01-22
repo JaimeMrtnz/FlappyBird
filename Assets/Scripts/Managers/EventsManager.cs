@@ -33,6 +33,7 @@ public class EventsManager
     public static UnityEvent<LoginResult> OnLoginSuccess                                                                    = new UnityEvent<LoginResult>();
     public static UnityEvent OnUpdateLeaderBoardSuccess                                                                     = new UnityEvent();
     public static UnityEvent OnRefreshInventory                                                                             = new UnityEvent();
+    public static UnityEvent<string> OnVirtualCurrencySubstracted                                                           = new UnityEvent<string>();
     public static UnityEvent OnRefreshingLeaderboard                                                                        = new UnityEvent();
     public static UnityEvent<PlayFabPurchaseManager, Dictionary<string, ItemComponents>>  OnCatalogItemsReceived            = new UnityEvent<PlayFabPurchaseManager, Dictionary<string, ItemComponents>>();
     public static UnityEvent<PlayFabPurchaseManager, Dictionary<string, ItemComponents>>  OnCatalogItemsReceivedStoreUI     = new UnityEvent<PlayFabPurchaseManager, Dictionary<string, ItemComponents>>();
@@ -40,6 +41,7 @@ public class EventsManager
     public static UnityEvent<InitialTitleData> OnInitialTitleDataRetrieved                                                  = new UnityEvent<InitialTitleData>();
     public static UnityEvent<Dictionary<string, UserDataRecord>> OnUserDataRetrieved                                        = new UnityEvent<Dictionary<string, UserDataRecord>>();
     public static UnityEvent<string> OnItemClicked                                                                          = new UnityEvent<string>();
+    public static UnityEvent<string, int> OnFinishClicked                                                                   = new UnityEvent<string, int>();
     public static UnityEvent<ItemInstance, CatalogItem_CatalogCustomData> OnItemPurchased                                   = new UnityEvent<ItemInstance, CatalogItem_CatalogCustomData>();
     public static UnityEvent<string, float, DateTime?> OnItemTimerSuccess                                                   = new UnityEvent<string, float, DateTime?>();
     public static UnityEvent<uint> OnGoldCoinsReceived                                                                      = new UnityEvent<uint>();

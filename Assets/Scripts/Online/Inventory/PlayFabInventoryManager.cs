@@ -1,5 +1,6 @@
 using PlayFab;
 using PlayFab.ClientModels;
+using System;
 using System.Threading.Tasks;
 using UnityEngine;
 
@@ -8,6 +9,8 @@ using UnityEngine;
 /// </summary>
 public class PlayFabInventoryManager 
 {
+    private static string itemIdToFinish;
+
     /// <summary>
     /// Returns the user inventory
     /// </summary>
@@ -37,6 +40,25 @@ public class PlayFabInventoryManager
     }
 
     /// <summary>
+    /// Removes the user and amount of currency
+    /// ATTENTION: this is done here due to is was asked not to use CloudScript
+    /// This could allow users cheating by changing currencies values
+    /// </summary>
+    /// <param name="amount"></param>
+    /// <param name="currency"></param>
+    public static void RemoveVirtualCurrency(string itemId, int amount, string currency)
+    {
+        itemIdToFinish = itemId;
+        PlayFabClientAPI.SubtractUserVirtualCurrency(new SubtractUserVirtualCurrencyRequest()
+        {
+            Amount = amount,
+            VirtualCurrency = currency,
+        },
+        successResult => OnSubstractVirtualCurrencySuccess(successResult),
+        error => OnSubstractVirtualCurrencyError(error));
+    }
+
+    /// <summary>
     /// Consumes an item
     /// </summary>
     /// <param name="itemInstanceId"></param>
@@ -61,6 +83,18 @@ public class PlayFabInventoryManager
     {
         Debug.Log("Error adding virtual currency: ");
         Debug.Log(error.ErrorMessage);
+    }
+
+
+    private static void OnSubstractVirtualCurrencySuccess(ModifyUserVirtualCurrencyResult successResult)
+    {
+        EventsManager.OnVirtualCurrencySubstracted.Invoke(itemIdToFinish);
+        EventsManager.OnRefreshInventory.Invoke();
+    }
+
+    private static void OnSubstractVirtualCurrencyError(PlayFabError error)
+    {
+        EventsManager.OnError.Invoke(error.ErrorMessage);
     }
 
     private static void OnGetUserInventorySuccess(GetUserInventoryResult successResult)

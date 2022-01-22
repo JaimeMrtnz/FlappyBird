@@ -28,11 +28,14 @@ public class TimersManager : MonoBehaviour
     private void AddListeners()
     {
         EventsManager.OnItemTimerSuccess.AddListener(OnItemTimerSuccess);
+        EventsManager.OnItemTimerSuccess.AddListener(OnItemTimerSuccess);
+        EventsManager.OnVirtualCurrencySubstracted.AddListener(OnVirtualCurrencySubstracted);
     }
 
     private void RemoveListeners()
     {
         EventsManager.OnItemTimerSuccess.RemoveListener(OnItemTimerSuccess);
+        EventsManager.OnVirtualCurrencySubstracted.RemoveListener(OnVirtualCurrencySubstracted);
     }
 
     private void OnItemTimerSuccess(string itemId, float time, DateTime? goalTime)
@@ -81,5 +84,13 @@ public class TimersManager : MonoBehaviour
     public bool HasExpired(DateTime? time)
     {
         return (time.Value - DateTime.UtcNow).TotalSeconds < 0;
+    }
+
+    /// <summary>
+    /// 
+    /// </summary>
+    private void OnVirtualCurrencySubstracted(string itemId)
+    {
+        EventsManager.OnTimerCoundDownFinished.Invoke(itemId);
     }
 }
