@@ -12,6 +12,9 @@ public class OnlineManager : MonoBehaviour
     [SerializeField]
     private ItemsQueueManager itemsQueueManager;
 
+    [SerializeField]
+    private LeaderBoardManager leaderBoardManager;
+
     private string playFabId;
     private PlayFabAuthenticationContext authenticationContext;
     private PlayFabDataRetriever playFabDataRetriever;
@@ -86,6 +89,7 @@ public class OnlineManager : MonoBehaviour
     private async void OnInitialTitleDataRetrieved(InitialTitleData initialtitleData)
     {
         titleData = initialtitleData;
+        leaderBoardManager.Initialize(authenticationContext, initialtitleData.LeaderBoardId);
 
         var items = await PlayFabCatalogManager.GetItems(titleData);
         playFabPurchase = new PlayFabPurchaseManager(titleData.SoftCurrency, titleData.HardCurrency, titleData.StoreId, items, new UnityJsonUtilityAdapter());

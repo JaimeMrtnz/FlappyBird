@@ -81,6 +81,11 @@ public class GameManager : MonoBehaviour
         var scoreMultiplied = score * multiplier;
         totalGoldCoins += scoreMultiplied;
 
+        if (score > 0)
+        {
+            EventsManager.OnLastScore.Invoke(score); 
+        }
+
         EventsManager.OnNewTotalGoldCoins.Invoke(totalGoldCoins);
         EventsManager.OnGoldCoinsWon.Invoke(scoreMultiplied);
     }

@@ -14,6 +14,7 @@ public class EventsManager
     public static UnityEvent OnReplay                                           = new UnityEvent();
     public static UnityEvent OnPipeSucceeded                                    = new UnityEvent();
     public static UnityEvent<uint> OnNewScore                                   = new UnityEvent<uint>();
+    public static UnityEvent<uint> OnLastScore                                  = new UnityEvent<uint>();
     public static UnityEvent<uint> OnNewTotalGoldCoins                          = new UnityEvent<uint>();
     public static UnityEvent<uint> OnNewTotalGems                               = new UnityEvent<uint>();
     public static UnityEvent<uint> OnGoldCoinsWon                               = new UnityEvent<uint>();
@@ -30,9 +31,11 @@ public class EventsManager
 
     // Online
     public static UnityEvent<LoginResult> OnLoginSuccess                                                                    = new UnityEvent<LoginResult>();
+    public static UnityEvent OnUpdateLeaderBoardSuccess                                                                     = new UnityEvent();
     public static UnityEvent OnRefreshInventory                                                                             = new UnityEvent();
+    public static UnityEvent OnRefreshingLeaderboard                                                                        = new UnityEvent();
     public static UnityEvent<PlayFabPurchaseManager, Dictionary<string, ItemComponents>>  OnCatalogItemsReceived            = new UnityEvent<PlayFabPurchaseManager, Dictionary<string, ItemComponents>>();
-    public static UnityEvent<PlayFabPurchaseManager, Dictionary<string, ItemComponents>>  OnCatalogItemsReceivedStoreUI         = new UnityEvent<PlayFabPurchaseManager, Dictionary<string, ItemComponents>>();
+    public static UnityEvent<PlayFabPurchaseManager, Dictionary<string, ItemComponents>>  OnCatalogItemsReceivedStoreUI     = new UnityEvent<PlayFabPurchaseManager, Dictionary<string, ItemComponents>>();
     public static UnityEvent<UserInventory> OnGetUserInventorySuccess                                                       = new UnityEvent<UserInventory>();
     public static UnityEvent<InitialTitleData> OnInitialTitleDataRetrieved                                                  = new UnityEvent<InitialTitleData>();
     public static UnityEvent<Dictionary<string, UserDataRecord>> OnUserDataRetrieved                                        = new UnityEvent<Dictionary<string, UserDataRecord>>();
@@ -41,10 +44,11 @@ public class EventsManager
     public static UnityEvent<string, float, DateTime?> OnItemTimerSuccess                                                   = new UnityEvent<string, float, DateTime?>();
     public static UnityEvent<uint> OnGoldCoinsReceived                                                                      = new UnityEvent<uint>();
     public static UnityEvent<uint> OnGemsReceived                                                                           = new UnityEvent<uint>();
-   
+    public static UnityEvent<List<PlayerLeaderboardEntry>> OnLeaderBoardRefreshed                                           = new UnityEvent<List<PlayerLeaderboardEntry>>();
+
+
     // Power ups
     public static UnityEvent OnDoublePointsPurchased    = new UnityEvent();
     public static UnityEvent OnTriplePointsPurchased    = new UnityEvent();
     public static UnityEvent OnSpeedUpPurchased         = new UnityEvent();
-
 }

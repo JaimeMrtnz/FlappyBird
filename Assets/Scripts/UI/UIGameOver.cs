@@ -68,6 +68,11 @@ public class UIGameOver : UIPanel
         Hide();
     }
 
+    public void OnLeaderBoardClick()
+    {
+
+    }
+
     /// <summary>
     /// Listener when the game is over. Shows this panel
     /// </summary>
